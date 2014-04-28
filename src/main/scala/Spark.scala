@@ -13,7 +13,7 @@ class Spark(sc: SparkContext) extends GitProcessor {
     val authStats = commits.map { (parentCommitPair) =>
       require(parentCommitPair.size == 2)
       val repo = GitRepo(broadcastUrl.value)
-      val oParent = Option(parentCommitPair(0)).filter(_ ne "").map(repo.getCommit(_))
+      val oParent = if (parentCommitPair(0) == "") { None } else { Some(repo.getCommit(parentCommitPair(0))) }
       val commit = repo.getCommit(parentCommitPair(1))
       val diff = repo.diff(oParent, commit)
       (commit.getAuthorIdent.getEmailAddress, AuthorStats().add(diff))
