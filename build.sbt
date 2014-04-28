@@ -8,9 +8,7 @@ libraryDependencies += "org.eclipse.jgit" % "org.eclipse.jgit" % "3.3.1.20140324
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "0.9.1"
 
-// libraryDependencies += "org.scalaz" %% "scalaz-core" % "6.0.4"
-
-// libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "2.4"
+libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "2.4.0"
 
 scalacOptions ++= Seq("-deprecation", "-unchecked")
 

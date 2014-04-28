@@ -10,6 +10,7 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
   case x if x.contains(".dtd") => MergeStrategy.first
   case x if x.contains(".xsd") => MergeStrategy.first
   case x if x.contains("plugin.properties") => MergeStrategy.filterDistinctLines
+  case x if x.contains("LocalStrings") => MergeStrategy.filterDistinctLines
   case x => old(x)
 }
 }

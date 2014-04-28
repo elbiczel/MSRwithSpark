@@ -11,19 +11,19 @@ object Spark extends GitProcessor {
 
     val sc = new SparkContext(sparkUrl, "loc", sparkHome, Seq(jarFile))
     val broadcastUrl = sc.broadcast(url)
-    val repo = GitRepo(broadcastUrl.value)
-    val commits = sc.parallelize(repo.getCommits)
-    val authStats = commits.map { (sha) =>
+    val tmpRepo = GitRepo(broadcastUrl.value)
+    val shas = (tmpRepo.getCommits :+ "").reverse.sliding(2).toSeq
+    val commits = sc.parallelize(shas)
+    val authStats = commits.map { (parentCommitPair) =>
+      require(parentCommitPair.size == 2)
       val repo = GitRepo(broadcastUrl.value)
-      val commit = repo.getCommit(sha)
-      val diffs = repo.diff(commit)
-      val authorStats = diffs.foldLeft(AuthorStats())(
-        (stats: AuthorStats, diff: String) => stats.add(diff))
-      (commit.getAuthorIdent.getEmailAddress, authorStats)
+      val oParent = Option(parentCommitPair(0)).filter(_ ne "").map(repo.getCommit(_))
+      val commit = repo.getCommit(parentCommitPair(1))
+      val diff = repo.diff(oParent, commit)
+      (commit.getAuthorIdent.getEmailAddress, AuthorStats().add(diff))
     }.reduceByKey(reducer)
     authStats.collectAsMap().toMap
   }
 
-  private val reducer: (AuthorStats, AuthorStats) => AuthorStats =
-    (acc, value) => acc.add(value)
+  private val reducer: (AuthorStats, AuthorStats) => AuthorStats = (acc, value) => acc.add(value)
 }

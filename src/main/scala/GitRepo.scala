@@ -1,21 +1,30 @@
 import java.io.{ByteArrayOutputStream, File}
 
-import org.eclipse.jgit.treewalk.{EmptyTreeIterator, CanonicalTreeParser}
 import scala.collection.JavaConversions._
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.{DiffFormatter, RawTextComparator}
-import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.revwalk.{RevWalk, RevCommit}
+import org.eclipse.jgit.lib.{ObjectId, Repository}
+import org.eclipse.jgit.revwalk.{RevCommit, RevWalk}
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.treewalk.{CanonicalTreeParser, EmptyTreeIterator}
 
+/**
+ * This class is not thread safe!
+ */
 class GitRepo(val repo: Repository) {
 
   val reader = repo.newObjectReader()
+  val walk = new RevWalk(repo)
+  val os = new ByteArrayOutputStream
+  val df = new DiffFormatter(os)
+  df.setRepository(repo)
+  df.setDiffComparator(RawTextComparator.DEFAULT)
+  df.setDetectRenames(true)
+  val parser: CanonicalTreeParser = new CanonicalTreeParser
 
   def getCommit(sha: String): RevCommit = {
-    val walk = new RevWalk(repo)
-    walk.parseCommit(repo.getRef(sha).getObjectId)
+    walk.parseCommit(ObjectId.fromString(sha))
   }
 
   def getCommits: Seq[String] = {
@@ -25,24 +34,17 @@ class GitRepo(val repo: Repository) {
     logs.map(revCommit => revCommit.getId.name).toSeq
   }
 
-  def diff(revCommit: RevCommit): Seq[String] = {
-    val os = new ByteArrayOutputStream
-    val df = new DiffFormatter(os)
-    df.setRepository(repo)
-    df.setDiffComparator(RawTextComparator.DEFAULT)
-    df.setDetectRenames(true)
-    val diffs = if (revCommit.getParentCount > 0) {
-      val parentCommit = revCommit.getParent(0)
-      df.scan(parentCommit.getTree, revCommit.getTree).toSeq
-    } else {
-      val parser: CanonicalTreeParser = new CanonicalTreeParser
+  def diff(parent: Option[RevCommit], revCommit: RevCommit): String = {
+    os.reset()
+    parent.map { parentCommit =>
+      df.scan(parentCommit.getTree, revCommit.getTree)
+    }.getOrElse {
       parser.reset(reader, revCommit.getTree)
-      df.scan(new EmptyTreeIterator(), parser).toSeq
-    }
-    diffs.foreach { diffEntry =>
+      df.scan(new EmptyTreeIterator(), parser)
+    }.foreach { diffEntry =>
       df.format(diffEntry)
     }
-    Seq(os.toString)
+    os.toString
   }
 }
 
