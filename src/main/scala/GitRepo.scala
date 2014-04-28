@@ -39,11 +39,10 @@ class GitRepo(val repo: Repository) {
       parser.reset(reader, revCommit.getTree)
       df.scan(new EmptyTreeIterator(), parser).toSeq
     }
-    diffs.map { diffEntry =>
-      os.reset()
+    diffs.foreach { diffEntry =>
       df.format(diffEntry)
-      os.toString
     }
+    Seq(os.toString)
   }
 }
 
