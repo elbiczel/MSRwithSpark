@@ -1,5 +1,6 @@
 import java.io.{ByteArrayOutputStream, File}
 
+import org.eclipse.jgit.treewalk.{EmptyTreeIterator, CanonicalTreeParser}
 import scala.collection.JavaConversions._
 
 import org.eclipse.jgit.api.Git
@@ -30,16 +31,18 @@ class GitRepo(val repo: Repository) {
     df.setRepository(repo)
     df.setDiffComparator(RawTextComparator.DEFAULT)
     df.setDetectRenames(true)
-    if (revCommit.getParentCount > 0) {
+    val diffs = if (revCommit.getParentCount > 0) {
       val parentCommit = revCommit.getParent(0)
-      val diffs = df.scan(revCommit.getTree, parentCommit.getTree).toSeq
-      diffs.map { diffEntry =>
-        os.reset()
-        df.format(diffEntry)
-        os.toString
-      }
+      df.scan(parentCommit.getTree, revCommit.getTree).toSeq
     } else {
-      Seq()
+      val parser: CanonicalTreeParser = new CanonicalTreeParser
+      parser.reset(reader, revCommit.getTree)
+      df.scan(new EmptyTreeIterator(), parser).toSeq
+    }
+    diffs.map { diffEntry =>
+      os.reset()
+      df.format(diffEntry)
+      os.toString
     }
   }
 }
