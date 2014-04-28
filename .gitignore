@@ -1,0 +1,32 @@
+# IDE & System
+*.iml
+.idea
+.DS_Store
+
+# Java
+*.class
+
+# Scala & sbt
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.scala_dependencies
+
+# Package Files
+*.war
+*.ear
+
+# Others
+logs
+*.log
+
+# vagrant
+.vagrant
+vagrant/dependencies
+
+# vim
+.*.swp
+.*.swo
