@@ -10,6 +10,7 @@ object Sequential extends GitProcessor {
     val head = revWalk.parseCommit(repo.repo.getRef("refs/heads/master").getObjectId)
     revWalk.markStart(head)
     val authorStats = Map[String, AuthorStats]().withDefaultValue(AuthorStats(0, 0))
+    println("starting analysis: " + url)
     foldCommits(authorStats, revWalk, None, repo)
   }
 

@@ -1,4 +1,4 @@
-case class AuthorStats(deletions: Int, additions: Int) {
+case class AuthorStats(deletions: Long, additions: Long) {
 
   def add(diffEntry: String): AuthorStats = {
     val lines = diffEntry.split("\n")

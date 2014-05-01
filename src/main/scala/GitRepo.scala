@@ -52,13 +52,16 @@ object GitRepo {
 
   def apply(url: String): GitRepo = {
     if (isRemote(url)) {
+      println("remote: " + url)
       val localPath = new File("GitRepo")
       if (!localPath.exists()) {
         if (localPath.mkdir()) {
+          println("cloning: " + url)
           Git.cloneRepository()
               .setURI(url)
               .setDirectory(localPath)
               .call()
+          println("cloned: " + url)
         }
       }
       getLocalRepo(new File(localPath, ".git"))
