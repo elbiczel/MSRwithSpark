@@ -9,7 +9,7 @@ class Spark(sc: SparkContext) extends GitProcessor {
     val broadcastUrl = sc.broadcast(url)
     val tmpRepo = GitRepo(broadcastUrl.value)
     val shas = (tmpRepo.getCommits :+ "").reverse.sliding(2).toSeq
-    val commits = sc.parallelize(shas)
+    val commits = sc.parallelize(shas, shas.size / 2)
     val authStats = commits.map { (parentCommitPair) =>
       require(parentCommitPair.size == 2)
       val repo = GitRepo(broadcastUrl.value)
