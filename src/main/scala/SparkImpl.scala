@@ -17,7 +17,7 @@ class SparkImpl(sc: SparkContext, parralelismCreator: (Int => Int)) extends GitP
       val commit = repo.getCommit(parentCommitPair(1))
       val diff = repo.diff(oParent, commit)
       (commit.getAuthorIdent.getEmailAddress, AuthorStats().add(diff))
-    }.reduceByKey(reducer)
+    }.reduceByKey(reducer, 1)
     authStats.collectAsMap().toMap
   }
 }
