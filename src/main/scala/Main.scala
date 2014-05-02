@@ -2,7 +2,7 @@ object Main {
 
   def main (args: Array[String]) {
     val processor: GitProcessor = if (args.contains("-spark")) {
-      Spark
+      new SparkWithContext()
     } else if (args.contains("-naive")) {
       SequentialNaive
     } else {

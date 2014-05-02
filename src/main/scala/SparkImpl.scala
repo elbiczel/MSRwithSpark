@@ -1,7 +1,7 @@
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
-class Spark(sc: SparkContext) extends GitProcessor {
+class SparkImpl(sc: SparkContext) extends GitProcessor {
 
   private val reducer: (AuthorStats, AuthorStats) => AuthorStats = (acc, value) => acc.add(value)
 
@@ -22,14 +22,24 @@ class Spark(sc: SparkContext) extends GitProcessor {
   }
 }
 
-object Spark extends GitProcessor  {
+private[this] case class SparkWithContext(
+    sparkHome: String = "/root/spark",
+    jarFile: String = "/root/loc.jar",
+    sparkUrl: String = "spark://localhost:7077",
+    sparkMaxCores: Option[String] = None) extends GitProcessor {
 
-  val sparkHome = "/Users/tomek/Development/spark-0.9.1" //"/root/spark"
-  val sparkUrl = "local"
-  val jarFile = "target/scala-2.10/loc-assembly-1.0.jar"
-
-  val sc = new SparkContext(sparkUrl, "loc", sparkHome, Seq(jarFile))
-  val spark = new Spark(sc)
-
-  def apply(url: String): Map[String, AuthorStats] = spark(url)
+  def apply(url: String): Map[String, AuthorStats] = {
+    val conf = new SparkConf()
+        .setSparkHome(sparkHome)
+        .setMaster(sparkUrl)
+        .setAppName("MSR-Loc")
+        .setJars(Seq(jarFile))
+        .set("spark.executor.memory", "6g")
+    if (sparkMaxCores.isDefined) {
+      conf.set("spark.cores.max", sparkMaxCores.get)
+    }
+    val sc = new SparkContext(conf)
+    val spark = new SparkImpl(sc)
+    spark(url)
+  }
 }
