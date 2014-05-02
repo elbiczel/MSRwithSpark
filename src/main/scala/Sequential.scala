@@ -7,7 +7,7 @@ object Sequential extends GitProcessor {
   def apply(url: String): Map[String, AuthorStats] = {
     val repo = GitRepo(url)
     val revWalk = new RevWalk(repo.repo)
-    val head = revWalk.parseCommit(repo.repo.getRef("refs/heads/master").getObjectId)
+    val head = revWalk.parseCommit(repo.repo.getRef("refs/heads/trunk").getObjectId)
     revWalk.markStart(head)
     val authorStats = Map[String, AuthorStats]().withDefaultValue(AuthorStats(0, 0))
     println("starting analysis: " + url)
