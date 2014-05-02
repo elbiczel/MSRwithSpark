@@ -34,7 +34,7 @@ private[this] case class SparkWithContext(
         .setMaster(sparkUrl)
         .setAppName("MSR-Loc")
         .setJars(Seq(jarFile))
-        .set("spark.executor.memory", "6g")
+        .set("spark.executor.memory", "12g")
     if (sparkMaxCores.isDefined) {
       conf.set("spark.cores.max", sparkMaxCores.get)
     }
