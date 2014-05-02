@@ -14,15 +14,15 @@ mv httpd ~/
 ~/spark-ec2/copy-dir ~/jenkins
 ~/spark-ec2/copy-dir ~/httpd
 
+cd ~/
+
 source ./spark/conf/spark-env.sh
 export ADD_JARS=/root/jars/loc.jar
-
-cd ~/
 
 ./spark/bin/spark-shell
 
 # val spark = new SparkImpl(sc, (commitsCount) => commitsCount / 2)
-# val spark = new SparkImpl(sc, (commitsCount) => 60) // K * N nodes * 4 processors + CONSTANT
+# val spark = new SparkImpl(sc, (commitsCount) => 120) // K * N nodes * 4 processors + CONSTANT
 # val commitStats = spark("/root/volley")
 # val commitStats = spark("/root/spring-framework")
 # val commitStats = spark("/root/jenkins")
