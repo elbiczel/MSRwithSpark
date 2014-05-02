@@ -24,7 +24,7 @@ class SparkImpl(sc: SparkContext) extends GitProcessor {
 
 private[this] case class SparkWithContext(
     sparkHome: String = "/root/spark",
-    jarFile: String = "/root/loc.jar",
+    jarFile: String = "/root/jars/loc.jar",
     sparkUrl: String = "spark://localhost:7077",
     sparkMaxCores: Option[String] = None) extends GitProcessor {
 
