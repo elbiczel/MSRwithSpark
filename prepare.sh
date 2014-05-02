@@ -1,3 +1,6 @@
+git clone https://github.com/elbiczel/MSRwithSpark.git
+cd MSRwithSpark
+
 ./sbt/sbt assembly
 mkdir ~/jars
 mv target/scala-2.10/loc-assembly-1.0.jar ~/jars/loc.jar
@@ -22,7 +25,7 @@ export ADD_JARS=/root/jars/loc.jar
 ./spark/bin/spark-shell
 
 # val spark = new SparkImpl(sc, (commitsCount) => commitsCount / 2)
-# val spark = new SparkImpl(sc, (commitsCount) => 120) // K * N nodes * 4 processors + CONSTANT
+# val spark = new SparkImpl(sc, (commitsCount) => 60) // K * N nodes * 4 processors + CONSTANT
 # val commitStats = spark("/root/volley")
 # val commitStats = spark("/root/spring-framework")
 # val commitStats = spark("/root/jenkins")
