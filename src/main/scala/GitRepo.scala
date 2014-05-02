@@ -16,7 +16,7 @@ class GitRepo(val repo: Repository) {
 
   val reader = repo.newObjectReader()
   val walk = new RevWalk(repo)
-  val os = new ByteArrayOutputStream
+  val os = new DiffCalculation
   val df = new DiffFormatter(os)
   df.setRepository(repo)
   df.setDiffComparator(RawTextComparator.DEFAULT)
@@ -34,7 +34,7 @@ class GitRepo(val repo: Repository) {
     logs.map(revCommit => revCommit.getId.name).toSeq
   }
 
-  def diff(parent: Option[RevCommit], revCommit: RevCommit): String = {
+  def diff(parent: Option[RevCommit], revCommit: RevCommit): DiffCalculation = {
     os.reset()
     parent.map { parentCommit =>
       df.scan(parentCommit.getTree, revCommit.getTree)
@@ -44,7 +44,7 @@ class GitRepo(val repo: Repository) {
     }.foreach { diffEntry =>
       df.format(diffEntry)
     }
-    os.toString
+    os
   }
 }
 

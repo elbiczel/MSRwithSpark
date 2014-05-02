@@ -7,16 +7,7 @@ case class AuthorStats(deletions: Long, additions: Long) {
     AuthorStats(newDeletions + deletions, newAdditions + additions)
   }
 
-  def addAll(diffs: Seq[String]): AuthorStats = {
-    val diffLines = diffs.flatMap(_.split("\n"))
-    val newAdditions = diffLines
-        .filter(line => line.startsWith("+"))
-        .size
-    val newDeletions = diffLines
-        .filter(line => line.startsWith("-"))
-        .size
-    AuthorStats(newDeletions + deletions, newAdditions + additions)
-  }
+  def add(diff: DiffCalculation): AuthorStats = AuthorStats(diff.deletions + deletions, diff.additions + additions)
 
   def add(other: AuthorStats): AuthorStats = {
     AuthorStats(deletions + other.deletions, additions + other.additions)
