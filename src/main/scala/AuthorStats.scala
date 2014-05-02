@@ -8,13 +8,13 @@ case class AuthorStats(deletions: Long, additions: Long) {
   }
 
   def addAll(diffs: Seq[String]): AuthorStats = {
-    val diffLines = diffs.map(_.split("\n"))
-    val newAdditions = diffLines.map(lines => lines
+    val diffLines = diffs.flatMap(_.split("\n"))
+    val newAdditions = diffLines
         .filter(line => line.startsWith("+"))
-        .size).sum
-    val newDeletions = diffLines.map(lines => lines
+        .size
+    val newDeletions = diffLines
         .filter(line => line.startsWith("-"))
-        .size).sum
+        .size
     AuthorStats(newDeletions + deletions, newAdditions + additions)
   }
 
