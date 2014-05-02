@@ -2,7 +2,7 @@ name := "loc"
 
 version := "1.0"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.10.3"
 
 libraryDependencies += "org.eclipse.jgit" % "org.eclipse.jgit" % "3.3.1.201403241930-r"
 
