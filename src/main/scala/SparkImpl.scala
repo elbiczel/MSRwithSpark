@@ -1,7 +1,7 @@
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
-class SparkImpl(sc: SparkContext) extends GitProcessor {
+class SparkImpl(sc: SparkContext, parralelismCreator: (Int => Int)) extends GitProcessor {
 
   private val reducer: (AuthorStats, AuthorStats) => AuthorStats = (acc, value) => acc.add(value)
 
@@ -9,7 +9,7 @@ class SparkImpl(sc: SparkContext) extends GitProcessor {
     val broadcastUrl = sc.broadcast(url)
     val tmpRepo = GitRepo(broadcastUrl.value)
     val shas = (tmpRepo.getCommits :+ "").reverse.sliding(2).toSeq
-    val commits = sc.parallelize(shas, shas.size / 2)
+    val commits = sc.parallelize(shas, parralelismCreator(shas.size))
     val authStats = commits.map { (parentCommitPair) =>
       require(parentCommitPair.size == 2)
       val repo = GitRepo(broadcastUrl.value)
@@ -39,7 +39,7 @@ private[this] case class SparkWithContext(
       conf.set("spark.cores.max", sparkMaxCores.get)
     }
     val sc = new SparkContext(conf)
-    val spark = new SparkImpl(sc)
+    val spark = new SparkImpl(sc, (commitsCount) => commitsCount / 2)
     spark(url)
   }
 }
